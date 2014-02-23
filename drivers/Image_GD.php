@@ -8,6 +8,10 @@
  * @copyright  (c) 2008-2009 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
+function _imagecreatefrom_s3($filename) {
+	return imagecreatefromstring(Yii::app()->fileSystem->readString($filename));
+}
+
 class Image_GD extends Image
 {
 
@@ -84,13 +88,13 @@ class Image_GD extends Image
 		// Set the image creation function name
 		switch ($this->type) {
 			case IMAGETYPE_JPEG:
-				$create = 'imagecreatefromjpeg';
+				$create = '_imagecreatefrom_s3';
 				break;
 			case IMAGETYPE_GIF:
-				$create = 'imagecreatefromgif';
+				$create = '_imagecreatefrom_s3';
 				break;
 			case IMAGETYPE_PNG:
-				$create = 'imagecreatefrompng';
+				$create = '_imagecreatefrom_s3';
 				break;
 		}
 

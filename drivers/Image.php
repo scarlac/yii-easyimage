@@ -88,12 +88,15 @@ class Image
 	 */
 	public function __construct($file)
 	{
+		// FIXME: Avoid re-reading image when doing manipulations / cache image data
+
 		try {
-			// Get the real path to the file
-			$file = realpath($file);
+			// don't realpath() $file, since that could break urls
+			// read image data directly from filesystem/S3
+			$data = Yii::app()->fileSystem->readString($file);
 
 			// Get the image information
-			$info = getimagesize($file);
+			$info = getimagesizefromstring($data);
 		} catch (Exception $e) {
 			// Ignore all errors while reading the image
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * EasyImage class file.
+ * Based off of "EasyImage". Modified to load from S3 and save thumbs locally
  * @author Artur Zhdanov <zhdanovartur@gmail.com>
  * @copyright Copyright &copy; Artur Zhdanov 2013-
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
@@ -232,6 +232,8 @@ class EasyImage extends CApplicationComponent
                     break;
                 case 'type':
                     break;
+                case 'cache': // dummy action for setting caching options
+                    break;
                 default:
                     throw new CException('Action "' . $key . '" is not found');
             }
@@ -248,12 +250,12 @@ class EasyImage extends CApplicationComponent
     public function thumbSrcOf($file, $params = array())
     {
         // Paths
-        $hash = md5($file . serialize($params));
-        $cachePath = Yii::getpathOfAlias('webroot') . $this->cachePath . $hash{0};
+        $hash = $params['cache']['filename'] ?: md5($file . serialize($params));
+        $cachePath = Yii::getpathOfAlias('webroot') . $this->cachePath . ($params['cache']['dir']);
         $cacheFileExt = isset($params['type']) ? $params['type'] : pathinfo($file, PATHINFO_EXTENSION);
         $cacheFileName = $hash . '.' . $cacheFileExt;
         $cacheFile = $cachePath . DIRECTORY_SEPARATOR . $cacheFileName;
-        $webCacheFile = Yii::app()->baseUrl . $this->cachePath . $hash{0} . '/' . $cacheFileName;
+        $webCacheFile = Yii::app()->baseUrl . $this->cachePath . ($params['cache']['dir']) . '/' . $cacheFileName;
 
         // Return URL to the cache image
         if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $this->cacheTime)) {
